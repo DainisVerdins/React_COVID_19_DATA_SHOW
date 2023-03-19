@@ -1,0 +1,15 @@
+.App {
+  text-align: center;
+}
+.react-tabs__tab--selected {
+  background: #fff;
+  border-color: #aaa;
+  color: black;
+  border-radius: 5px 5px 0 0;
+  color: green;
+}
+
+.page {
+  background-color: aqua;
+  margin: 20px 20px 20px 20px;
+}
