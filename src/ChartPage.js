@@ -3,8 +3,9 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsi
 import React, { useState, useMemo } from 'react'
 import Select from 'react-select'
 import countryList from 'react-select-country-list'
+import { useEffect } from 'react';
 
-const data = [
+const datas = [
     {
         month: 'January',
         savings: 5000,
@@ -42,14 +43,49 @@ GeoId == country value
 */
 
 
-const ChartPage = () => {
+const ChartPage = ({ data, selectedStartDate, selectedEndDate }) => {
 
     const [country, setCountry] = useState('')
     const options = useMemo(() => countryList().getData(), [])
-  
+    const [dataForChart, setDataForChart] = useState([]);
+    const [selectedOldEndDate, setSelectedOldEndDate] = useState(selectedEndDate);
+    const [selectedOldStartDate, setSelectedStartDate] = useState(selectedStartDate);
+
+    const [fool, setFoo] = useState(data);
+
     const changeHandler = value => {
         setCountry(value)
+        setNewDataForChart(value.value);
     }
+
+    useEffect(() => {
+        if (!country)
+            return;
+            //if prop value changed remake chart
+        if (selectedOldEndDate !== selectedEndDate) {
+            setNewDataForChart(country.value);
+            setSelectedOldEndDate(selectedEndDate);
+        }
+        if (selectedOldStartDate !== selectedEndDate) {
+            setNewDataForChart(country.value);
+            setSelectedStartDate(selectedStartDate);
+        }
+
+    }, [selectedStartDate, selectedEndDate]);
+
+
+    function setNewDataForChart(countryCode) {
+        if (!countryCode)
+            return;
+
+        const newChartData = fool.filter((record) => {
+            const recordDate = new Date(`${record.year}-${record.month}-${record.day}`);
+
+            return record.geoId === countryCode && (recordDate >= selectedStartDate && recordDate <= selectedEndDate);
+        });
+        setDataForChart(newChartData);
+    }
+
 
     return (
         <div className='chart-page-container'>
@@ -60,7 +96,7 @@ const ChartPage = () => {
             </div>
             <div className='graph-container'>
                 <ResponsiveContainer width="100%" height={400}>
-                    <LineChart data={data}>
+                    <LineChart data={datas}>
                         <CartesianGrid></CartesianGrid>
                         <XAxis dataKey="month"></XAxis>
                         <YAxis></YAxis>
