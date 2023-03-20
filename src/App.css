@@ -1,15 +1,17 @@
 .App {
   text-align: center;
 }
-.react-tabs__tab--selected {
-  background: #fff;
-  border-color: #aaa;
-  color: black;
-  border-radius: 5px 5px 0 0;
-  color: green;
-}
 
 .page {
-  background-color: aqua;
   margin: 20px 20px 20px 20px;
+  border-color: red;
+  border-style: solid;
+}
+
+/* ALL ABOUT DATAPICKER NAVBAR COMPONENT */
+.data-picker-navbar-container {
+  border-color: green;
+  border-style: solid;
+  margin: 20px auto 20px auto;
+  padding:20px;
 }

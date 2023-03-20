@@ -33,8 +33,8 @@ See the section about [deployment](https://facebook.github.io/create-react-app/d
 ## For visual appierence and components Bootstrap-react
 See the section about [bootstrap-react](https://react-bootstrap.github.io/getting-started/introduction/) for more information.
 
-## For Tab component
-See the section about [tab component on react](https://github.com/reactjs/react-tabs) for more information.
-
 ## For Data table component
 See the section about [Data table component on React](https://react-data-table-component.netlify.app/?path=/docs/getting-started-intro--page) for more information.
+
+## For datapicker component
+See the section about [Datapicker component](https://reactdatepicker.com) for more information.

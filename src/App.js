@@ -1,24 +1,51 @@
-import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
-import 'react-tabs/style/react-tabs.css';
 import './App.css';
+import Form from 'react-bootstrap/Form';
+import Tab from 'react-bootstrap/Tab';
+import Tabs from 'react-bootstrap/Tabs';
+import DataPickerNavbar from './DataPickerNavbar';
+import { useState } from 'react';
 
 function App() {
-  return (
-    <div className='page'>
-      <Tabs>
-        <TabList>
-          <Tab>Title 1</Tab>
-          <Tab>Title 2</Tab>
-        </TabList>
+  const allowedStartDate = new Date("2023-03-01");
+  const allowedEndDate = new Date("2023-03-31");
 
-        <TabPanel>
-          <h2>Any content 1</h2>
-        </TabPanel>
-        <TabPanel>
-          <h2>Any content 2</h2>
-        </TabPanel>
+  const [startRangeDate, setStartRangeDate] = useState(allowedStartDate);
+  const [endRangeDate, setEndRangeDate] = useState(allowedEndDate);
+
+  function handleStartDateChange(date){
+    setStartRangeDate(date);
+  }
+
+  function handleEndDateChange(date){
+    setEndRangeDate(date);
+  }
+
+  return (
+    <Form className="page">
+
+      <DataPickerNavbar 
+        allowedStartDate={ allowedStartDate }
+        allowedEndDate={ allowedEndDate }  
+        handleStartDateChange = {handleStartDateChange} 
+        handleEndDateChange = {handleEndDateChange} 
+      />
+
+      <Tabs
+        defaultActiveKey="profile"
+        id="uncontrolled-tab-example"
+        className="mb-3"
+      >
+        <Tab eventKey="home" title="Home">
+          <p>Tab one</p>
+        </Tab>
+        <Tab eventKey="profile" title="Profile">
+          <p>Tab two</p>
+        </Tab>
       </Tabs>
-    </div>
+      {startRangeDate.toDateString()}
+      <br></br>
+      {endRangeDate.toDateString()}
+    </Form>
   );
 }
 
