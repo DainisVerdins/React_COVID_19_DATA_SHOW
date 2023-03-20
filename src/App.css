@@ -15,3 +15,21 @@
   margin: 20px auto 20px auto;
   padding:20px;
 }
+
+
+/*All about ChartPage component*/
+
+.chart-page-container {
+  border-color: blue;
+  border-style: solid;
+  padding: 20px;
+}
+
+.graph-container {
+  position: relative; 
+  width: 100%; 
+}
+
+.page-navbar-container {
+  margin-bottom: 20px;
+}
