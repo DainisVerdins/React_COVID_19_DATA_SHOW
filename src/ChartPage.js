@@ -4,54 +4,17 @@ import React, { useState, useMemo } from 'react'
 import Select from 'react-select'
 import countryList from 'react-select-country-list'
 import { useEffect } from 'react';
-
-const datas = [
-    {
-        month: 'January',
-        savings: 5000,
-        loss: 500
-    },
-    {
-        month: 'February',
-        savings: 8000,
-        loss: 300
-    },
-    {
-        month: 'March',
-        savings: 3000,
-        loss: 800
-    },
-    {
-        month: 'April',
-        savings: 6000,
-        loss: 100
-    },
-    {
-        month: 'May',
-        savings: 4000,
-        loss: 700
-    },
-    {
-        month: 'June',
-        savings: 9000,
-        loss: 1200
-    },
-]
-
-/*
-GeoId == country value
-*/
-
+import DataEmptyLabel from './DataEmptyLabel';
+import constants from './constants/constants';
+import moment from 'moment'
 
 const ChartPage = ({ data, selectedStartDate, selectedEndDate }) => {
 
     const [country, setCountry] = useState('')
     const options = useMemo(() => countryList().getData(), [])
-    const [dataForChart, setDataForChart] = useState([]);
+    const [dataForChart, setDataForChart] = useState(null);
     const [selectedOldEndDate, setSelectedOldEndDate] = useState(selectedEndDate);
     const [selectedOldStartDate, setSelectedStartDate] = useState(selectedStartDate);
-
-    const [fool, setFoo] = useState(data);
 
     const changeHandler = value => {
         setCountry(value)
@@ -61,7 +24,7 @@ const ChartPage = ({ data, selectedStartDate, selectedEndDate }) => {
     useEffect(() => {
         if (!country)
             return;
-            //if prop value changed remake chart
+        //if prop value changed remake chart
         if (selectedOldEndDate !== selectedEndDate) {
             setNewDataForChart(country.value);
             setSelectedOldEndDate(selectedEndDate);
@@ -71,18 +34,26 @@ const ChartPage = ({ data, selectedStartDate, selectedEndDate }) => {
             setSelectedStartDate(selectedStartDate);
         }
 
-    }, [selectedStartDate, selectedEndDate]);
-
+    }, [country, selectedStartDate, selectedEndDate, selectedOldStartDate, selectedOldEndDate]);
 
     function setNewDataForChart(countryCode) {
         if (!countryCode)
             return;
 
-        const newChartData = fool.filter((record) => {
+        const newChartData = data.filter((record) => {
             const recordDate = new Date(`${record.year}-${record.month}-${record.day}`);
 
             return record.geoId === countryCode && (recordDate >= selectedStartDate && recordDate <= selectedEndDate);
-        });
+        })
+        .sort((x, y) => { return new Date(`${x.year}-${x.month}-${x.day}`) - new Date(`${y.year}-${y.month}-${y.day}`); })
+        .map(((sortedResult) => {
+            return {
+                date: moment(new Date(`${sortedResult.year}-${sortedResult.month}-${sortedResult.day}`)).format(constants.DATE_FORMAT.toUpperCase()),
+                deaths: sortedResult.deaths,
+                cases: sortedResult.cases
+            }
+        }));
+
         setDataForChart(newChartData);
     }
 
@@ -90,20 +61,24 @@ const ChartPage = ({ data, selectedStartDate, selectedEndDate }) => {
     return (
         <div className='chart-page-container'>
             <div className='page-navbar-container'>
-                <p>Выбери страну </p>
+                <h1>Выбери страну </h1>
                 <Select options={options} value={country} onChange={changeHandler} />
-                {country.value}
             </div>
-            <div className='graph-container'>
-                <ResponsiveContainer width="100%" height={400}>
-                    <LineChart data={datas}>
+            <div className='chart-container'>
+                { (dataForChart?.length===0 || dataForChart ===null) && <DataEmptyLabel/>}
+                <ResponsiveContainer width="100%" height={400} >
+                    <LineChart data={dataForChart}>
                         <CartesianGrid></CartesianGrid>
-                        <XAxis dataKey="month"></XAxis>
-                        <YAxis></YAxis>
+                        <XAxis
+                            dataKey="date"
+                            label={{ value: 'Периуд', position: 'insideBottomRight', offset: 0 }}
+                            domain={[selectedStartDate, selectedEndDate]}
+                            />
+                        <YAxis label={{ value: 'Случаи', angle: -90, position: 'insideLeft' }}></YAxis>
                         <Tooltip> </Tooltip>
                         <Legend>Some Crap</Legend>
-                        <Line type="monotone" dataKey="loss" stroke="green" />
-                        <Line type="monotone" dataKey="savings" stroke="red" />
+                        <Line type="monotone" dataKey="cases" stroke="green" />
+                        <Line type="monotone" dataKey="deaths" stroke="red"  />
                     </LineChart>
                 </ResponsiveContainer>
             </div>

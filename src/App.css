@@ -25,11 +25,37 @@
   padding: 20px;
 }
 
-.graph-container {
+.chart-container {
   position: relative; 
   width: 100%; 
 }
 
 .page-navbar-container {
   margin-bottom: 20px;
+}
+
+/*data empty label*/
+.data-empty-label-container {
+  position: inherit;
+  z-index: 50;
+  display: flex;
+  justify-content: center;
+  top: 200px;
+  margin-left: 50px; /*chart y axis label is 50px width*/
+}
+
+/*All about grid page*/
+
+.grid-page-container {
+  border-color: blue;
+  border-style: solid;
+  padding: 20px;
+}
+
+.grid-menu-bar {
+  margin-bottom: 20px;
+}
+
+.classec {
+  display: flex;
 }

@@ -6,6 +6,7 @@ import DataPickerNavbar from './DataPickerNavbar';
 import { useState, useEffect  } from 'react';
 import ChartPage from './ChartPage';
 import constants from './constants/constants';
+import GridPage from './GridPage';
 
 function App() {
   const [minDate, setMinDate] = useState(null);
@@ -82,6 +83,13 @@ function App() {
         className="mb-3"
       >
         <Tab eventKey="home" title="Таблица">
+          <GridPage
+            selectedStartDate={ selectedStartDate }
+            selectedEndDate={ selectedEndDate } 
+            data = {covidStatistics}
+          />
+        </Tab>
+        <Tab eventKey="profile" title="График">
         { minDate && maxDate &&
           <ChartPage
             selectedStartDate={ selectedStartDate }
@@ -89,9 +97,6 @@ function App() {
             data = {covidStatistics}
             />
         }
-        </Tab>
-        <Tab eventKey="profile" title="Profile">
-          <p>Tab two</p>
         </Tab>
       </Tabs>
       {minDate && minDate.toDateString()}
