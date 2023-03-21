@@ -72,7 +72,6 @@ const ChartPage = ({ data, selectedStartDate, selectedEndDate }) => {
                         <XAxis
                             dataKey="date"
                             label={{ value: 'Периуд', position: 'insideBottomRight', offset: 0 }}
-
                             />
                         <YAxis
                             label={{ value: 'Случаи', angle: -90, position: 'insideLeft' }}

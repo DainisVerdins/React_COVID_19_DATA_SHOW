@@ -13,7 +13,8 @@ import searchIcon from './assets/icons/search.svg';
 
 import React, { useState, useEffect } from 'react'
 
-import sortBy from './enums/sort-by-enum';
+import filterBy from './enums/filter-by-enum';
+
 
 const columns = [
     {
@@ -63,22 +64,27 @@ const columns = [
 
 const GridPage = ({ data, selectedStartDate, selectedEndDate }) => {
 
-    const [formatedData, setFormatedData] = useState([]);//is dictionary key-> country code : value-> array of records of that country
+    const [defaultGridData, setDefaultGridData] = useState([]);
     const [gridData, setGridData] = useState([]);
-    const [countryCodes, setCountryCodes] = useState(null);
+    const [countriesNames, setCountriesNames] = useState(null);
+
+    const [countryFilterInput, setCountryFilterInput] = useState('');
+
+    const [filterFrom, setFilterFrom] = useState('');
+    const [filterTo, setFilterTo] = useState('');
 
     useEffect(() => {
         const countryCodes = new Set();
+        const countryNames = new Set();
         for (const record of data) {
             countryCodes.add(record.geoId);
+            countryNames.add(record.countriesAndTerritories.split('_').join(' '));
         }
+        setCountriesNames(countryNames);
         let dict = {};
         for (const countryCode of countryCodes) {
             dict[countryCode] = data.filter(record => { return record.geoId === countryCode });
         }
-
-        setFormatedData(dict);
-        setCountryCodes(countryCodes);
 
         let newGridData = [];
         for (const countryCode of countryCodes) {
@@ -91,6 +97,7 @@ const GridPage = ({ data, selectedStartDate, selectedEndDate }) => {
 
             newGridData = newGridData.concat(dict[countryCode].map(record => {
                 return {
+                    countryGeoId: record.geoId,
                     countryName: record.countriesAndTerritories.split('_').join(' '),
                     cases: record.cases,
                     deaths: record.deaths,
@@ -101,9 +108,8 @@ const GridPage = ({ data, selectedStartDate, selectedEndDate }) => {
                 }
             }));
         }
-
-        console.log(newGridData);
-        setGridData(newGridData);
+        setDefaultGridData(newGridData);
+        setGridData(newGridData)
 
     }, []);
 
@@ -128,36 +134,51 @@ const GridPage = ({ data, selectedStartDate, selectedEndDate }) => {
     }
 
 
-    function handleSortingClick(sortingEnum) {
-        switch (sortingEnum) {
-            case sortBy.Country:
+    function handleFilteringClick(filteringEnum) {
+        switch (filteringEnum) {
+            case filterBy.Country:
+                console.log('filterFrom', filterFrom);
+                console.log(countriesNames.has(filterFrom))
+                console.log(countriesNames.has(filterTo))
+                if (!countriesNames.has(filterFrom)) {
+                    console.log('TOAST !')
+                    return;
+                }
+
+                if (!countriesNames.has(filterTo)) {
+                    console.log('TOAST !')
+                    return;
+                }
+                /*const newDataGrid = defaultGridData.filter(record=>{
+
+                    return record.countryName
+                })*/
+                break;
+            case filterBy.Cases:
 
                 break;
-            case sortBy.Cases:
+            case filterBy.Cases:
 
                 break;
-            case sortBy.Cases:
+            case filterBy.Deaths:
 
                 break;
-            case sortBy.Deaths:
+            case filterBy.TotalCases:
 
                 break;
-            case sortBy.TotalCases:
-
-                break;
-            case sortBy.TotalDeaths:
+            case filterBy.TotalDeaths:
 
                 break;
 
-            case sortBy.TotalDeaths:
+            case filterBy.TotalDeaths:
 
                 break;
 
-            case sortBy.CasesPerThousand:
+            case filterBy.CasesPerThousand:
 
                 break;
 
-            case sortBy.DeathsPerThousand:
+            case filterBy.DeathsPerThousand:
 
                 break;
             default:
@@ -165,6 +186,33 @@ const GridPage = ({ data, selectedStartDate, selectedEndDate }) => {
         }
     }
 
+    function handleResetFilters() {
+        setGridData(defaultGridData);
+        setCountryFilterInput('');
+        setFilterFrom('');
+        setFilterTo('');
+    }
+
+    function handleCountryFilterInput(event) {
+        const filterText = event.target.value;
+
+        setCountryFilterInput(filterText);
+        const newGridData = defaultGridData.filter(record => {
+            return record.countryName && record.countryName.toLowerCase().includes(filterText.toLowerCase());
+        });
+
+        setGridData(newGridData);
+    }
+
+    function handleFilterFrom(event) {
+        const filterText = event.target.value;
+        setFilterFrom(filterText);
+    }
+
+    function handleFilterTo(event) {
+        const filterText = event.target.value;
+        setFilterTo(filterText);
+    }
 
     return (
         <div className='grid-page-container'>
@@ -174,44 +222,62 @@ const GridPage = ({ data, selectedStartDate, selectedEndDate }) => {
                         <InputGroup className="mb-3">
                             <Form.Control
                                 placeholder="Поиск страны"
+                                onChange={handleCountryFilterInput}
+                                value={countryFilterInput}
                             />
-                            <Button variant="outline-secondary" >
+                            <InputGroup.Text >
                                 <img className='icon' src={searchIcon} aria-hidden="true" alt="search icon" />
-                            </Button>
+                            </InputGroup.Text>
                         </InputGroup>
                     </Col>
                     <Col>
                         <Dropdown>
-                            <Dropdown.Toggle className="w-100" variant="success" id="dropdown-basic">
+                            <Dropdown.Toggle
+                                className="w-100"
+                                variant="success"
+                            >
                                 Фильтровать по полю...
                             </Dropdown.Toggle>
 
-                            <Dropdown.Menu className="w-100 ">
-                                <Dropdown.Item onClick={() => handleSortingClick(sortBy.Country)}>Страна</Dropdown.Item>
-                                <Dropdown.Item onClick={() => handleSortingClick(sortBy.Cases)}>Количество случиев</Dropdown.Item>
-                                <Dropdown.Item onClick={() => handleSortingClick(sortBy.Deaths)}>Количество Смертей</Dropdown.Item>
-                                <Dropdown.Item onClick={() => handleSortingClick(sortBy.TotalCases)}>Количество случиев Всего</Dropdown.Item>
-                                <Dropdown.Item onClick={() => handleSortingClick(sortBy.TotalDeaths)}>Количество смертей Всего</Dropdown.Item>
-                                <Dropdown.Item onClick={() => handleSortingClick(sortBy.CasesPerThousand)}>Количество случаев на 1к жителей</Dropdown.Item>
-                                <Dropdown.Item onClick={() => handleSortingClick(sortBy.DeathsPerThousand)}>Количество смертей на 1к жителей</Dropdown.Item>
+                            <Dropdown.Menu
+                                className="w-auto"
+                                drop="down-centered"
+                            >
+                                <Dropdown.Item onClick={() => handleFilteringClick(filterBy.Country)}>Страна</Dropdown.Item>
+                                <Dropdown.Item onClick={() => handleFilteringClick(filterBy.Cases)}>Количество случиев</Dropdown.Item>
+                                <Dropdown.Item onClick={() => handleFilteringClick(filterBy.Deaths)}>Количество Смертей</Dropdown.Item>
+                                <Dropdown.Item onClick={() => handleFilteringClick(filterBy.TotalCases)}>Количество случиев Всего</Dropdown.Item>
+                                <Dropdown.Item onClick={() => handleFilteringClick(filterBy.TotalDeaths)}>Количество смертей Всего</Dropdown.Item>
+                                <Dropdown.Item onClick={() => handleFilteringClick(filterBy.CasesPerThousand)}>Количество случаев на 1к жителей</Dropdown.Item>
+                                <Dropdown.Item onClick={() => handleFilteringClick(filterBy.DeathsPerThousand)}>Количество смертей на 1к жителей</Dropdown.Item>
                             </Dropdown.Menu>
                         </Dropdown>
 
                     </Col>
                     <Col>
                         <div className="grid-input-range-fields-container">
-                            <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
-                                <Form.Control type="input" placeholder="ОТ" />
+                            <Form.Group className="mb-3">
+                                <Form.Control
+                                    type="input"
+                                    placeholder="ОТ"
+                                    onChange={handleFilterFrom}
+                                    value={filterFrom}
+                                />
                             </Form.Group>
-                            <Form.Group className="mb-3 ms-3" controlId="exampleForm.ControlInput1">
-                                <Form.Control type="input" placeholder="ДО" />
+                            <Form.Group className="mb-3 ms-3" >
+                                <Form.Control
+                                    type="input"
+                                    placeholder="ДО"
+                                    onChange={handleFilterTo}
+                                    value={filterTo}
+                                />
                             </Form.Group>
                         </div>
                     </Col>
                 </Row>
 
                 <div className='d-flex flex-row-reverse'>
-                    <Button> Сбросить фильтры </Button>
+                    <Button onClick={handleResetFilters}> Сбросить фильтры </Button>
                 </div>
             </div>
             <div>
@@ -219,10 +285,8 @@ const GridPage = ({ data, selectedStartDate, selectedEndDate }) => {
                     columns={columns}
                     data={gridData}
                     pagination
-			        persistTableHead
-                >
-                   
-                </DataTable>
+                    persistTableHead
+                />
             </div>
         </div>
     );

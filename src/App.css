@@ -72,3 +72,7 @@
   height: 16px;
   width: 16px;
 }
+/*To break columns name long words to*/
+.hcgwbo {
+  white-space: break-spaces !important;
+}

@@ -1,4 +1,4 @@
-const SortBy = {
+const FilterBy = {
     Country: 1,
     Cases: 2,
     Deaths: 3,
@@ -7,7 +7,7 @@ const SortBy = {
     CasesPerThousand: 6,
     DeathsPerThousand: 7
 };
-Object.freeze(SortBy);
+Object.freeze(FilterBy);
 
-export default SortBy;
+export default FilterBy;
 
