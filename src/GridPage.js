@@ -137,9 +137,6 @@ const GridPage = ({ data, selectedStartDate, selectedEndDate }) => {
     function handleFilteringClick(filteringEnum) {
         switch (filteringEnum) {
             case filterBy.Country:
-                console.log('filterFrom', filterFrom);
-                console.log(countriesNames.has(filterFrom))
-                console.log(countriesNames.has(filterTo))
                 if (!countriesNames.has(filterFrom)) {
                     console.log('TOAST !')
                     return;
@@ -149,10 +146,11 @@ const GridPage = ({ data, selectedStartDate, selectedEndDate }) => {
                     console.log('TOAST !')
                     return;
                 }
-                /*const newDataGrid = defaultGridData.filter(record=>{
+                const newDataGrid = defaultGridData.filter(record => {
+                    return filterFrom <= record.countryName && record.countryName <= filterTo;
+                })
 
-                    return record.countryName
-                })*/
+                setGridData(newDataGrid);
                 break;
             case filterBy.Cases:
 
