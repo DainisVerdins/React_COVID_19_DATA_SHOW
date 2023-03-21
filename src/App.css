@@ -56,6 +56,19 @@
   margin-bottom: 20px;
 }
 
-.classec {
+.grid-input-range-fields-container {
   display: flex;
+  justify-content: space-between;
+  flex-wrap: nowrap;
+}
+
+.dropmenu{
+  text-align: center;
+  background-color: red;
+}
+
+/* all about icons */
+.icon {
+  height: 16px;
+  width: 16px;
 }

@@ -72,9 +72,12 @@ const ChartPage = ({ data, selectedStartDate, selectedEndDate }) => {
                         <XAxis
                             dataKey="date"
                             label={{ value: 'Периуд', position: 'insideBottomRight', offset: 0 }}
-                            domain={[selectedStartDate, selectedEndDate]}
+
                             />
-                        <YAxis label={{ value: 'Случаи', angle: -90, position: 'insideLeft' }}></YAxis>
+                        <YAxis
+                            label={{ value: 'Случаи', angle: -90, position: 'insideLeft' }}
+                            type="number" domain={['10', '20']}
+                            />
                         <Tooltip> </Tooltip>
                         <Legend>Some Crap</Legend>
                         <Line type="monotone" dataKey="cases" stroke="green" />

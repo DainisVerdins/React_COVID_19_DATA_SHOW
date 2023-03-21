@@ -83,11 +83,13 @@ function App() {
         className="mb-3"
       >
         <Tab eventKey="home" title="Таблица">
+        { minDate && maxDate &&
           <GridPage
             selectedStartDate={ selectedStartDate }
             selectedEndDate={ selectedEndDate } 
-            data = {covidStatistics}
+            data={covidStatistics}
           />
+        }
         </Tab>
         <Tab eventKey="profile" title="График">
         { minDate && maxDate &&
