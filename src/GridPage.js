@@ -1,6 +1,6 @@
 
-import DataTable from 'react-data-table-component-with-filter';
-import FilterComponent from 'react-data-table-component-with-filter'
+import DataTable from 'react-data-table-component';
+//import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 
 import Col from 'react-bootstrap/Col';
@@ -14,6 +14,13 @@ import searchIcon from './assets/icons/search.svg';
 import React, { useState, useEffect } from 'react'
 
 import filterBy from './enums/filter-by-enum';
+
+import { ToastContainer } from 'react-toastify';
+
+import { toast } from 'react-toastify';
+import "react-toastify/dist/ReactToastify.css";
+
+import Helpers from './helpers/helpers';
 
 
 const columns = [
@@ -133,40 +140,68 @@ const GridPage = ({ data, selectedStartDate, selectedEndDate }) => {
         return output;
     }
 
+    /*Filters data in grid using for that objectkey as key for property */
+    function filterDataForGrid(Objectkey, filterFrom, filterTo) {
+        if (defaultGridData[0][Objectkey]) {
+            const newDataGrid = defaultGridData.filter(record => {
+                return filterFrom <= record[Objectkey] && record[Objectkey] <= filterTo;
+            })
+            setGridData(newDataGrid);
+        } else {
+            throw Error('Objectkey does not belongs to object containing in defaultGridData array');
+        }
+    }
 
     function handleFilteringClick(filteringEnum) {
         switch (filteringEnum) {
-            case filterBy.Country:
+            case filterBy.Country: {
                 if (!countriesNames.has(filterFrom)) {
-                    console.log('TOAST !')
+                    Helpers.errorToastWithMessage(`Ведёное название страны в поле ОТ "${filterFrom}" не существует`);
                     return;
                 }
 
                 if (!countriesNames.has(filterTo)) {
-                    console.log('TOAST !')
+                    Helpers.errorToastWithMessage(`Ведёное название страны в поле ДО "${filterTo}" не существует`);
                     return;
                 }
-                const newDataGrid = defaultGridData.filter(record => {
-                    return filterFrom <= record.countryName && record.countryName <= filterTo;
-                })
 
-                setGridData(newDataGrid);
-                break;
-            case filterBy.Cases:
+                filterDataForGrid('countryName', filterFrom, filterTo);
 
                 break;
-            case filterBy.Cases:
+            }
+            case filterBy.Cases: {
+                /* TODO: figure out what to do with cases then number is float*/
+
+                if (!Helpers.isNumeric(filterFrom)) {
+                    Helpers.errorToastWithMessage(`Ведёное значение в поле ОТ "${filterFrom}" не являеться числом`);
+                    return;
+                }
+
+                if (!Helpers.isNumeric(filterTo)) {
+                    Helpers.errorToastWithMessage(`Ведёное значение в поле ДО "${filterTo}" не являеться числом`);
+                    return;
+                }
+
+                filterDataForGrid('cases', filterFrom, filterTo)
 
                 break;
-            case filterBy.Deaths:
+            }
+            case filterBy.Cases: {
 
                 break;
-            case filterBy.TotalCases:
+            }
+            case filterBy.Deaths: {
 
                 break;
-            case filterBy.TotalDeaths:
+            }
+            case filterBy.TotalCases: {
 
                 break;
+            }
+            case filterBy.TotalDeaths: {
+
+                break;
+            }
 
             case filterBy.TotalDeaths:
 
@@ -214,6 +249,7 @@ const GridPage = ({ data, selectedStartDate, selectedEndDate }) => {
 
     return (
         <div className='grid-page-container'>
+            <ToastContainer />
             <div className='grid-menu-bar'>
                 <Row>
                     <Col>
@@ -250,7 +286,6 @@ const GridPage = ({ data, selectedStartDate, selectedEndDate }) => {
                                 <Dropdown.Item onClick={() => handleFilteringClick(filterBy.DeathsPerThousand)}>Количество смертей на 1к жителей</Dropdown.Item>
                             </Dropdown.Menu>
                         </Dropdown>
-
                     </Col>
                     <Col>
                         <div className="grid-input-range-fields-container">

@@ -1,5 +1,4 @@
 import './App.css';
-import Form from 'react-bootstrap/Form';
 import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
 import DataPickerNavbar from './DataPickerNavbar';
@@ -69,7 +68,7 @@ function App() {
   }
 
   return (
-    <Form className="page">
+    <div className="page">
       {(!isLoaded) && <Spinner animation="border" />}
       {isLoaded &&
         <DataPickerNavbar
@@ -114,7 +113,7 @@ function App() {
       <br></br>
       {selectedEndDate && selectedEndDate.toDateString()}
       <br></br>
-    </Form>
+    </div>
   );
 }
 

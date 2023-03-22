@@ -38,3 +38,7 @@ See the section about [Data table component on React](https://react-data-table-c
 
 ## For datapicker component
 See the section about [Datapicker component](https://reactdatepicker.com) for more information.
+
+
+## For toastify library
+See the section about [React-Toastify](https://www.npmjs.com/package/react-toastify) for more information.
