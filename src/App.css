@@ -14,24 +14,30 @@
   border-style: solid;
   margin: 20px auto 20px auto;
   padding:20px;
+  background-color: #FFFF;
+  border-radius: 25px;
 }
 
 
 /*All about ChartPage component*/
 
 .chart-page-container {
-  border-color: blue;
-  border-style: solid;
-  padding: 20px;
+  padding: 0 20px 20px 20px;
 }
 
 .chart-container {
   position: relative; 
   width: 100%; 
+  background-color: #FFFF;
+  border-radius: 25px;
+  padding: 10px;
 }
 
 .page-navbar-container {
-  margin-bottom: 20px;
+  margin: 20px 0 20px 0;
+  background-color: #FFFF;
+  border-radius: 25px;
+  padding: 20px;
 }
 
 /*data empty label*/
@@ -47,19 +53,26 @@
 /*All about grid page*/
 
 .grid-page-container {
-  border-color: blue;
-  border-style: solid;
   padding: 20px;
 }
 
 .grid-menu-bar {
   margin-bottom: 20px;
+  background-color: #FFFF;
+  border-radius: 25px;
+  padding: 10px;
 }
 
 .grid-input-range-fields-container {
   display: flex;
   justify-content: space-between;
   flex-wrap: nowrap;
+}
+
+.data-table-container {
+  padding: 10px;
+  border-radius: 25px;
+  background-color: #FFFF;
 }
 
 .dropmenu{
@@ -75,4 +88,12 @@
 /*To break columns name long words to*/
 .hcgwbo {
   white-space: break-spaces !important;
+}
+
+.nav-link {
+  border: var(--bs-nav-tabs-border-width) solid black !important;
+}
+
+.nav-tabs {
+  border-bottom: 1px solid black !important;
 }

@@ -120,14 +120,14 @@ const GridPage = ({ data, selectedStartDate, selectedEndDate }) => {
         }
         setDefaultGridData(newGridData);
 
-        newGridData = newGridData.filter(record =>{return record.date >= selectedStartDate && record.date <= selectedEndDate})
+        newGridData = newGridData.filter(record => { return record.date >= selectedStartDate && record.date <= selectedEndDate })
         setGridData(newGridData)
 
     }, []);
 
     useEffect(() => {
-        if(selectedOldEndDate!==selectedEndDate || selectedOldStartDate!==selectedStartDate){
-            const newGridData = gridData.filter(record=>{
+        if (selectedOldEndDate !== selectedEndDate || selectedOldStartDate !== selectedStartDate) {
+            const newGridData = gridData.filter(record => {
                 return (record.date >= selectedStartDate && record.date <= selectedEndDate);
             });
             setSelectedOldEndDate(selectedEndDate);
@@ -135,7 +135,7 @@ const GridPage = ({ data, selectedStartDate, selectedEndDate }) => {
 
             setGridData(newGridData);
         }
-    },[selectedStartDate, selectedEndDate]);
+    }, [selectedStartDate, selectedEndDate]);
 
     function perThousandPeople(rate, totalPopulation) {
         return (1000 * (rate / totalPopulation)).toFixed(2);
@@ -270,7 +270,7 @@ const GridPage = ({ data, selectedStartDate, selectedEndDate }) => {
 
                 filterDataForGrid('casesOnThousandPeople', parseFloat(filterFrom), parseFloat(filterTo));
                 break;
-            }  
+            }
             case filterBy.DeathsPerThousand: {
                 if (!Helpers.isNumeric(filterFrom)) {
                     Toast.errorToastWithMessage(`Ведёное значение в поле ОТ "${filterFrom}" не являеться числом`);
@@ -291,7 +291,7 @@ const GridPage = ({ data, selectedStartDate, selectedEndDate }) => {
     }
 
     function handleResetFilters() {
-        setGridData(defaultGridData.filter(record =>{return record.date >= selectedStartDate && record.date <= selectedEndDate}));
+        setGridData(defaultGridData.filter(record => { return record.date >= selectedStartDate && record.date <= selectedEndDate }));
         setCountryFilterInput('');
         setFilterFrom('');
         setFilterTo('');
@@ -384,7 +384,7 @@ const GridPage = ({ data, selectedStartDate, selectedEndDate }) => {
                     <Button onClick={handleResetFilters}> Сбросить фильтры </Button>
                 </div>
             </div>
-            <div>
+            <div className="data-table-container">
                 <DataTable
                     columns={columns}
                     data={gridData}

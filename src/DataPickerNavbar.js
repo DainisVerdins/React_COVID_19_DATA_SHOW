@@ -14,10 +14,11 @@ const DataPickerNavbar = ({minDate, maxDate, selectedStartDate, selectedEndDate,
     return (
         <div className="data-picker-navbar-container">
             <Row className="align-items-start">
-                <Col>
+                <Col xl={6}>
+                    <div>
                     <p> Период от </p>
-                </Col>
-                <Col>
+                    </div>
+                    <div>
                     <DatePicker
                         dateFormat={Constants.DATE_FORMAT}
                         showIcon
@@ -27,11 +28,11 @@ const DataPickerNavbar = ({minDate, maxDate, selectedStartDate, selectedEndDate,
                         onChange={(date) => handleStartDateChange(date)}
                         calendarStartDay={1} //sets datepicker week day one
                     />
-                </Col>
-                <Col>
+                    </div>
+                    <div>
                     <p> до </p>
-                </Col>
-                <Col>
+
+                    </div>
                     <DatePicker
                         dateFormat={Constants.DATE_FORMAT}
                         showIcon
