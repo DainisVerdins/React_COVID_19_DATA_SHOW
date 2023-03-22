@@ -16,11 +16,10 @@ import React, { useState, useEffect } from 'react'
 import filterBy from './enums/filter-by-enum';
 
 import { ToastContainer } from 'react-toastify';
-
-import { toast } from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css";
 
 import Helpers from './helpers/helpers';
+import Toast from './helpers/toast-helper';
 
 
 const columns = [
@@ -75,6 +74,9 @@ const GridPage = ({ data, selectedStartDate, selectedEndDate }) => {
     const [gridData, setGridData] = useState([]);
     const [countriesNames, setCountriesNames] = useState(null);
 
+    const [selectedOldEndDate, setSelectedOldEndDate] = useState(selectedEndDate);
+    const [selectedOldStartDate, setSelectedStartDate] = useState(selectedStartDate);
+
     const [countryFilterInput, setCountryFilterInput] = useState('');
 
     const [filterFrom, setFilterFrom] = useState('');
@@ -112,13 +114,28 @@ const GridPage = ({ data, selectedStartDate, selectedEndDate }) => {
                     deathsAll: deathTotal,
                     casesOnThousandPeople: casesOnThousandPeople,
                     deathsOnThousandPeople: deathsOnThousandPeople,
+                    date: new Date(`${record.year}-${record.month}-${record.day}`)
                 }
             }));
         }
         setDefaultGridData(newGridData);
+
+        newGridData = newGridData.filter(record =>{return record.date >= selectedStartDate && record.date <= selectedEndDate})
         setGridData(newGridData)
 
     }, []);
+
+    useEffect(() => {
+        if(selectedOldEndDate!==selectedEndDate || selectedOldStartDate!==selectedStartDate){
+            const newGridData = gridData.filter(record=>{
+                return (record.date >= selectedStartDate && record.date <= selectedEndDate);
+            });
+            setSelectedOldEndDate(selectedEndDate);
+            setSelectedStartDate(selectedStartDate);
+
+            setGridData(newGridData);
+        }
+    },[selectedStartDate, selectedEndDate]);
 
     function perThousandPeople(rate, totalPopulation) {
         return (1000 * (rate / totalPopulation)).toFixed(2);
@@ -156,12 +173,12 @@ const GridPage = ({ data, selectedStartDate, selectedEndDate }) => {
         switch (filteringEnum) {
             case filterBy.Country: {
                 if (!countriesNames.has(filterFrom)) {
-                    Helpers.errorToastWithMessage(`Ведёное название страны в поле ОТ "${filterFrom}" не существует`);
+                    Toast.errorToastWithMessage(`Ведёное название страны в поле ОТ "${filterFrom}" не существует`);
                     return;
                 }
 
                 if (!countriesNames.has(filterTo)) {
-                    Helpers.errorToastWithMessage(`Ведёное название страны в поле ДО "${filterTo}" не существует`);
+                    Toast.errorToastWithMessage(`Ведёное название страны в поле ДО "${filterTo}" не существует`);
                     return;
                 }
 
@@ -170,7 +187,43 @@ const GridPage = ({ data, selectedStartDate, selectedEndDate }) => {
                 break;
             }
             case filterBy.Cases: {
-                /* TODO: figure out what to do with cases then number is float*/
+                /* TODO: figure out what to do with cases when number is float*/
+
+                if (!Helpers.isNumeric(filterFrom)) {
+                    Toast.errorToastWithMessage(`Ведёное значение в поле ОТ "${filterFrom}" не являеться числом`);
+                    return;
+                }
+
+                if (!Helpers.isNumeric(filterTo)) {
+                    Toast.errorToastWithMessage(`Ведёное значение в поле ДО "${filterTo}" не являеться числом`);
+                    return;
+                }
+
+                filterDataForGrid('cases', filterFrom, filterTo)
+
+                break;
+            }
+            case filterBy.Deaths: {
+
+                /* TODO: figure out what to do with cases when number is float*/
+
+                if (!Helpers.isNumeric(filterFrom)) {
+                    Toast.errorToastWithMessage(`Ведёное значение в поле ОТ "${filterFrom}" не являеться числом`);
+                    return;
+                }
+
+                if (!Helpers.isNumeric(filterTo)) {
+                    Toast.errorToastWithMessage(`Ведёное значение в поле ДО "${filterTo}" не являеться числом`);
+                    return;
+                }
+
+                filterDataForGrid('deaths', filterFrom, filterTo)
+
+                break;
+            }
+            case filterBy.TotalCases: {
+
+                /* TODO: figure out what to do with cases when number is float*/
 
                 if (!Helpers.isNumeric(filterFrom)) {
                     Helpers.errorToastWithMessage(`Ведёное значение в поле ОТ "${filterFrom}" не являеться числом`);
@@ -182,45 +235,63 @@ const GridPage = ({ data, selectedStartDate, selectedEndDate }) => {
                     return;
                 }
 
-                filterDataForGrid('cases', filterFrom, filterTo)
-
-                break;
-            }
-            case filterBy.Cases: {
-
-                break;
-            }
-            case filterBy.Deaths: {
-
-                break;
-            }
-            case filterBy.TotalCases: {
+                filterDataForGrid('casesAll', filterFrom, filterTo)
 
                 break;
             }
             case filterBy.TotalDeaths: {
 
+                /* TODO: figure out what to do with cases when number is float*/
+
+                if (!Helpers.isNumeric(filterFrom)) {
+                    Helpers.errorToastWithMessage(`Ведёное значение в поле ОТ "${filterFrom}" не являеться числом`);
+                    return;
+                }
+
+                if (!Helpers.isNumeric(filterTo)) {
+                    Helpers.errorToastWithMessage(`Ведёное значение в поле ДО "${filterTo}" не являеться числом`);
+                    return;
+                }
+
+                filterDataForGrid('deathsAll', filterFrom, filterTo)
+
                 break;
             }
+            case filterBy.CasesPerThousand: {
+                if (!Helpers.isNumeric(filterFrom)) {
+                    Toast.errorToastWithMessage(`Ведёное значение в поле ОТ "${filterFrom}" не являеться числом`);
+                    return;
+                }
 
-            case filterBy.TotalDeaths:
+                if (!Helpers.isNumeric(filterTo)) {
+                    Toast.errorToastWithMessage(`Ведёное значение в поле ДО "${filterTo}" не являеться числом`);
+                    return;
+                }
 
+                filterDataForGrid('casesOnThousandPeople', parseFloat(filterFrom), parseFloat(filterTo));
                 break;
+            }  
+            case filterBy.DeathsPerThousand: {
+                if (!Helpers.isNumeric(filterFrom)) {
+                    Toast.errorToastWithMessage(`Ведёное значение в поле ОТ "${filterFrom}" не являеться числом`);
+                    return;
+                }
 
-            case filterBy.CasesPerThousand:
+                if (!Helpers.isNumeric(filterTo)) {
+                    Toast.errorToastWithMessage(`Ведёное значение в поле ДО "${filterTo}" не являеться числом`);
+                    return;
+                }
 
+                filterDataForGrid('deathsOnThousandPeople', parseFloat(filterFrom), parseFloat(filterTo));
                 break;
-
-            case filterBy.DeathsPerThousand:
-
-                break;
+            }
             default:
                 throw Error('wrong enum input');
         }
     }
 
     function handleResetFilters() {
-        setGridData(defaultGridData);
+        setGridData(defaultGridData.filter(record =>{return record.date >= selectedStartDate && record.date <= selectedEndDate}));
         setCountryFilterInput('');
         setFilterFrom('');
         setFilterTo('');
