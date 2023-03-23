@@ -68,9 +68,8 @@ const columns = [
 ];
 
 
-const GridPage = ({ data, selectedStartDate, selectedEndDate }) => {
+const GridPage = ({ defaultData, mutableData, selectedStartDate, selectedEndDate,handleMutableDataChange }) => {
 
-    const [defaultGridData, setDefaultGridData] = useState([]);
     const [gridData, setGridData] = useState([]);
     const [countriesNames, setCountriesNames] = useState(null);
 
@@ -83,46 +82,14 @@ const GridPage = ({ data, selectedStartDate, selectedEndDate }) => {
     const [filterTo, setFilterTo] = useState('');
 
     useEffect(() => {
-        const countryCodes = new Set();
         const countryNames = new Set();
-        for (const record of data) {
-            countryCodes.add(record.geoId);
-            countryNames.add(record.countriesAndTerritories.split('_').join(' '));
-        }
+        for (const record of defaultData)
+          countryNames.add(record.countryName);
+
         setCountriesNames(countryNames);
-        let dict = {};
-        for (const countryCode of countryCodes) {
-            dict[countryCode] = data.filter(record => { return record.geoId === countryCode });
-        }
 
-        let newGridData = [];
-        for (const countryCode of countryCodes) {
-            const casesTotal = findCasesAllForCountry(dict[countryCode]);
-            const deathTotal = findDeathAllForCountry(dict[countryCode]);
-            const population = dict[countryCode][0].popData2019;
-            const casesOnThousandPeople = perThousandPeople(casesTotal, population);
-            const deathsOnThousandPeople = perThousandPeople(deathTotal, population);
-
-
-            newGridData = newGridData.concat(dict[countryCode].map(record => {
-                return {
-                    countryGeoId: record.geoId,
-                    countryName: record.countriesAndTerritories.split('_').join(' '),
-                    cases: record.cases,
-                    deaths: record.deaths,
-                    casesAll: casesTotal,
-                    deathsAll: deathTotal,
-                    casesOnThousandPeople: casesOnThousandPeople,
-                    deathsOnThousandPeople: deathsOnThousandPeople,
-                    date: new Date(`${record.year}-${record.month}-${record.day}`)
-                }
-            }));
-        }
-        setDefaultGridData(newGridData);
-
-        newGridData = newGridData.filter(record => { return record.date >= selectedStartDate && record.date <= selectedEndDate })
-        setGridData(newGridData)
-
+        setGridData(defaultData);
+        
     }, []);
 
     useEffect(() => {
@@ -134,38 +101,21 @@ const GridPage = ({ data, selectedStartDate, selectedEndDate }) => {
             setSelectedStartDate(selectedStartDate);
 
             setGridData(newGridData);
+            handleMutableDataChange(newGridData);
         }
     }, [selectedStartDate, selectedEndDate]);
 
-    function perThousandPeople(rate, totalPopulation) {
-        return (1000 * (rate / totalPopulation)).toFixed(2);
-    }
-
-    function findCasesAllForCountry(countryData) {
-        let output = 0;
-        for (const record of countryData)
-            output += record.cases;
-
-        return output;
-    }
-
-    function findDeathAllForCountry(countryData) {
-        let output = 0;
-        for (const record of countryData)
-            output += record.deaths;
-
-        return output;
-    }
 
     /*Filters data in grid using for that objectkey as key for property */
     function filterDataForGrid(Objectkey, filterFrom, filterTo) {
-        if (defaultGridData[0][Objectkey]) {
-            const newDataGrid = defaultGridData.filter(record => {
+        if (defaultData[0][Objectkey]) {
+            const newDataGrid = defaultData.filter(record => {
                 return filterFrom <= record[Objectkey] && record[Objectkey] <= filterTo;
             })
             setGridData(newDataGrid);
+            handleMutableDataChange(newDataGrid);
         } else {
-            throw Error('Objectkey does not belongs to object containing in defaultGridData array');
+            throw Error('Objectkey does not belongs to object containing in defaultData array');
         }
     }
 
@@ -291,21 +241,23 @@ const GridPage = ({ data, selectedStartDate, selectedEndDate }) => {
     }
 
     function handleResetFilters() {
-        setGridData(defaultGridData.filter(record => { return record.date >= selectedStartDate && record.date <= selectedEndDate }));
+        setGridData(defaultData.filter(record => { return record.date >= selectedStartDate && record.date <= selectedEndDate }));
         setCountryFilterInput('');
         setFilterFrom('');
         setFilterTo('');
+        handleMutableDataChange(defaultData);
     }
 
     function handleCountryFilterInput(event) {
         const filterText = event.target.value;
 
         setCountryFilterInput(filterText);
-        const newGridData = defaultGridData.filter(record => {
+        const newGridData = defaultData.filter(record => {
             return record.countryName && record.countryName.toLowerCase().includes(filterText.toLowerCase());
         });
 
         setGridData(newGridData);
+        handleMutableDataChange(newGridData);
     }
 
     function handleFilterFrom(event) {

@@ -15,7 +15,8 @@ function App() {
   const [selectedStartDate, setSelectedStartDate] = useState(null);
   const [selectedEndDate, setSelectedEndDate] = useState(null);
 
-  const [covidStatistics, setCovidStatistics] = useState(null);
+  const [defaultData, setDefaultData] = useState(null); // stores in self data array what contains all records in specific manner
+  const [mutableData, setMutableData] = useState(null);// data what will change in grid filters or by date picker
 
   const [isLoaded, setIsLoaded] = useState(false);
 
@@ -28,20 +29,82 @@ function App() {
     setSelectedEndDate(date);
   }
 
+  function handleMutableDataChange(data){
+    setMutableData(data);
+  }
+
   useEffect(() => {
     fetch(constants.URL_OF_COVID_CASES)
       .then(res => { return res.json(); })
       .then(data => {
-        setCovidStatistics(data.records);
         const minDate = findMinDateOfRecords(data.records);
         setMinDate(minDate);
         setSelectedStartDate(minDate);
+
         const maxDate = findMaxDateOfRecords(data.records);
         setMaxDate(maxDate);
+
         setSelectedEndDate(maxDate);
+
+        const countryCodes = new Set();
+        const countryNames = new Set();
+        for (const record of data.records) {
+          countryCodes.add(record.geoId);
+          countryNames.add(record.countriesAndTerritories.split('_').join(' '));
+        }
+
+        let dict = {};
+        for (const countryCode of countryCodes) {
+          dict[countryCode] = data.records.filter(record => { return record.geoId === countryCode });
+        }
+
+        let defaultData = [];
+        for (const countryCode of countryCodes) {
+          const casesTotal = findCasesAllForCountry(dict[countryCode]);
+          const deathTotal = findDeathAllForCountry(dict[countryCode]);
+          const population = dict[countryCode][0].popData2019;
+          const casesOnThousandPeople = perThousandPeople(casesTotal, population);
+          const deathsOnThousandPeople = perThousandPeople(deathTotal, population);
+
+
+          defaultData = defaultData.concat(dict[countryCode].map(record => {
+            return {
+              countryGeoId: record.geoId,
+              countryName: record.countriesAndTerritories.split('_').join(' '),
+              cases: record.cases,
+              deaths: record.deaths,
+              casesAll: casesTotal,
+              deathsAll: deathTotal,
+              casesOnThousandPeople: casesOnThousandPeople,
+              deathsOnThousandPeople: deathsOnThousandPeople,
+              date: new Date(`${record.year}-${record.month}-${record.day}`)
+            }
+          }));
+        }
+        setDefaultData(defaultData);
         setIsLoaded(true);
       });
   }, []);
+
+  function perThousandPeople(rate, totalPopulation) {
+    return (1000 * (rate / totalPopulation)).toFixed(2);
+  }
+
+  function findCasesAllForCountry(countryData) {
+    let output = 0;
+    for (const record of countryData)
+      output += record.cases;
+
+    return output;
+  }
+
+  function findDeathAllForCountry(countryData) {
+    let output = 0;
+    for (const record of countryData)
+      output += record.deaths;
+
+    return output;
+  }
 
   function findMaxDateOfRecords(data) {
     /*Assumed what data in array could not be sorted by date*/
@@ -83,35 +146,29 @@ function App() {
       {isLoaded &&
         <Tabs
           defaultActiveKey="profile"
-          id="uncontrolled-tab-example"
         >
           <Tab eventKey="home" title="Таблица">
 
             <GridPage
               selectedStartDate={selectedStartDate}
               selectedEndDate={selectedEndDate}
-              data={covidStatistics}
+              defaultData={defaultData}
+              mutableData={mutableData}
+              handleMutableDataChange={handleMutableDataChange}
             />
 
           </Tab>
           <Tab eventKey="profile" title="График">
-            <ChartPage
+             <ChartPage
               selectedStartDate={selectedStartDate}
               selectedEndDate={selectedEndDate}
-              data={covidStatistics}
+              defaultData={defaultData}
+              mutableData={mutableData}
             />
 
           </Tab>
         </Tabs>
       }
-      {minDate && minDate.toDateString()}
-      <br></br>
-      {maxDate && maxDate.toDateString()}
-      <br></br>
-      {selectedStartDate && selectedStartDate.toDateString()}
-      <br></br>
-      {selectedEndDate && selectedEndDate.toDateString()}
-      <br></br>
     </div>
   );
 }
