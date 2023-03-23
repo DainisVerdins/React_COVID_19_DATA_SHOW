@@ -109,7 +109,6 @@ function App() {
   function findMaxDateOfRecords(data) {
     /*Assumed what data in array could not be sorted by date*/
     let endDate = new Date(`${data[0].year}-${data[0].month}-${data[0].day}`);
-    console.log('asdfasdf', endDate);
     for (const record of data) {
       let recordDate = new Date(`${record.year}-${record.month}-${record.day}`);
       if (endDate < recordDate)

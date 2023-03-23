@@ -68,7 +68,7 @@ const columns = [
 ];
 
 
-const GridPage = ({ defaultData, mutableData, selectedStartDate, selectedEndDate,handleMutableDataChange }) => {
+const GridPage = ({ defaultData, mutableData, selectedStartDate, selectedEndDate, handleMutableDataChange }) => {
 
     const [gridData, setGridData] = useState([]);
     const [countriesNames, setCountriesNames] = useState(null);
@@ -84,12 +84,12 @@ const GridPage = ({ defaultData, mutableData, selectedStartDate, selectedEndDate
     useEffect(() => {
         const countryNames = new Set();
         for (const record of defaultData)
-          countryNames.add(record.countryName);
+            countryNames.add(record.countryName);
 
         setCountriesNames(countryNames);
 
         setGridData(defaultData);
-        
+
     }, []);
 
     useEffect(() => {
